@@ -9,16 +9,20 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-xxxxxxxxxxxxxxxx"
             crossorigin="anonymous"></script>
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(to bottom, #e0f7fa, #ffffff);
-            margin: 0;
-            padding: 20px;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
             flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
         }
 
         .container {
@@ -28,7 +32,6 @@
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
             width: 100%;
             max-width: 480px;
-            margin: auto;
         }
 
         .field-group {
@@ -103,8 +106,9 @@
             text-align: center;
             font-size: 0.9em;
             color: #607d8b;
-            margin-top: auto;
-            margin-bottom: 10px;
+            position: fixed;
+            bottom: 10px;
+            left: 0;
         }
 
         .flatpickr-calendar {
@@ -200,7 +204,7 @@
             calendarRefs[prefix] = flatpickr(pickerElement, {
                 defaultDate: new Date(),
                 disableMobile: true,
-                position: "auto right",
+                position: "right",
                 positionElement: triggerElement,
                 onChange: function (selectedDates) {
                     const date = selectedDates[0];
