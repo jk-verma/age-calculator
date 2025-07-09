@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Age Calculator</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -21,23 +22,42 @@
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-            text-align: center;
-            width: 400px;
+            width: 450px;
             margin-bottom: 20px;
         }
 
-        input[type="date"] {
-            padding: 10px;
-            width: 100%;
-            box-sizing: border-box;
-            margin-bottom: 20px;
+        .field-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .field-group label {
+            flex: 0 0 140px;
+            text-align: left;
+            margin-right: 10px;
+            white-space: nowrap;
+        }
+
+        #dobMonth, #dobDay, #dobYear,
+        #ageMonth, #ageDay, #ageYear {
+            width: 60px !important;
+            min-width: 60px;
+            padding: 6px;
+            margin-right: 5px;
             border: 1px solid #b0bec5;
-            border-radius: 6px;
-            font-size: 1em;
+            border-radius: 4px;
+        }
+
+        .calendar-icon {
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
         }
 
         button {
-            padding: 12px 18px;
+            padding: 10px 15px;
             background-color: #0288d1;
             color: #ffffff;
             border: none;
@@ -45,6 +65,7 @@
             cursor: pointer;
             font-size: 1em;
             transition: background-color 0.3s ease;
+            width: 100%;
         }
 
         button:hover {
@@ -53,8 +74,9 @@
 
         #result {
             margin-top: 20px;
-            font-size: 1.2em;
+            font-size: 1.1em;
             color: #37474f;
+            text-align: center;
         }
 
         footer {
@@ -63,74 +85,118 @@
             font-size: 0.9em;
             color: #607d8b;
         }
+
+        .hidden-picker {
+            position: absolute;
+            left: -9999px;
+        }
     </style>
-
-    <!-- Google Adsense -->
-    <script data-ad-client="ca-pub-XXXXXXXXXXXXXXX" async
-            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-    <!-- Replace "ca-pub-XXXXXXXXXXXXXXX" with your own Adsense client ID -->
-
 </head>
 <body>
     <div class="container">
-        <h2> Age Calculator </h2>
-        <label for="dob">📅 Date of Birth:</label>
-        <input type="date" id="dob">
-        <label for="ageAt">📅 Age at the Date of:</label>
-        <input type="date" id="ageAt">
+        <h2 style="text-align: center;">Age Calculator</h2>
+
+        <div class="field-group">
+            <label>Date of Birth:</label>
+            <select id="dobMonth"></select>
+            <select id="dobDay"></select>
+            <input type="text" id="dobYear" placeholder="Year">
+            <input type="text" id="dobPicker" class="hidden-picker">
+            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" onclick="showCalendar('dob')">
+        </div>
+
+        <div class="field-group">
+            <label>Age at the Date of:</label>
+            <select id="ageMonth"></select>
+            <select id="ageDay"></select>
+            <input type="text" id="ageYear" placeholder="Year">
+            <input type="text" id="agePicker" class="hidden-picker">
+            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" onclick="showCalendar('age')">
+        </div>
+
         <button onclick="calculateAge()">Calculate Age</button>
         <div id="result"></div>
     </div>
-
-    <!-- Adsense Ad Slot -->
-    <ins class="adsbygoogle"
-         style="display:block; width: 400px; height: 100px;"
-         data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
-         data-ad-slot="XXXXXXXXXX"
-         data-ad-format="auto"
-         data-full-width-responsive="true"></ins>
-    <script>
-         (adsbygoogle = window.adsbygoogle || []).push({});
-    </script>
 
     <footer>
         &copy; 2025 Age Calculator. All rights reserved.
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
+        const calendarInstances = {};
+
+        function populateDaysAndMonths(dayId, monthId) {
+            const daySelect = document.getElementById(dayId);
+            const monthSelect = document.getElementById(monthId);
+
+            for (let i = 1; i <= 31; i++) {
+                let option = document.createElement('option');
+                option.value = i;
+                option.text = i;
+                daySelect.appendChild(option);
+            }
+
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            months.forEach((month, index) => {
+                let option = document.createElement('option');
+                option.value = index;
+                option.text = month;
+                monthSelect.appendChild(option);
+            });
+        }
+
+        function setDefaultDate(prefix) {
+            const today = new Date();
+            document.getElementById(`${prefix}Year`).value = today.getFullYear();
+            document.getElementById(`${prefix}Month`).value = today.getMonth();
+            document.getElementById(`${prefix}Day`).value = today.getDate();
+        }
+
+        function showCalendar(prefix) {
+            const picker = document.getElementById(`${prefix}Picker`);
+
+            if (!calendarInstances[prefix]) {
+                calendarInstances[prefix] = flatpickr(picker, {
+                    defaultDate: new Date(),
+                    onChange: function(selectedDates) {
+                        const date = selectedDates[0];
+                        document.getElementById(`${prefix}Year`).value = date.getFullYear();
+                        document.getElementById(`${prefix}Month`).value = date.getMonth();
+                        document.getElementById(`${prefix}Day`).value = date.getDate();
+                    },
+                    disableMobile: true
+                });
+            }
+
+            calendarInstances[prefix].open();
+        }
+
+        populateDaysAndMonths('dobDay', 'dobMonth');
+        populateDaysAndMonths('ageDay', 'ageMonth');
+
+        setDefaultDate('dob');
+        setDefaultDate('age');
+
         function calculateAge() {
-            let dob = document.getElementById('dob').value;
-            let ageAtDate = document.getElementById('ageAt').value;
+            const dob = new Date(document.getElementById('dobYear').value, document.getElementById('dobMonth').value, document.getElementById('dobDay').value);
+            const ageAt = new Date(document.getElementById('ageYear').value, document.getElementById('ageMonth').value, document.getElementById('ageDay').value);
 
-            if (dob === '' || ageAtDate === '') {
-                document.getElementById('result').innerText = 'Please enter both dates!';
-                return;
+            let years = ageAt.getFullYear() - dob.getFullYear();
+            let months = ageAt.getMonth() - dob.getMonth();
+            let days = ageAt.getDate() - dob.getDate();
+
+            if (days < 0) {
+                months--;
+                days += new Date(ageAt.getFullYear(), ageAt.getMonth(), 0).getDate();
             }
 
-            let birthDate = new Date(dob);
-            let ageAt = new Date(ageAtDate);
-
-            if (ageAt < birthDate) {
-                document.getElementById('result').innerText = 'Age at date must be after birth date!';
-                return;
+            if (months < 0) {
+                years--;
+                months += 12;
             }
 
-            let ageYears = ageAt.getFullYear() - birthDate.getFullYear();
-            let ageMonths = ageAt.getMonth() - birthDate.getMonth();
-            let ageDays = ageAt.getDate() - birthDate.getDate();
-
-            if (ageDays < 0) {
-                ageMonths--;
-                ageDays += new Date(ageAt.getFullYear(), ageAt.getMonth(), 0).getDate();
-            }
-
-            if (ageMonths < 0) {
-                ageYears--;
-                ageMonths += 12;
-            }
-
-            document.getElementById('result').innerText = 
-                `You were ${ageYears} years, ${ageMonths} months, and ${ageDays} days old.`;
+            document.getElementById('result').innerText = `You were ${years} years, ${months} months, and ${days} days old.`;
         }
     </script>
 </body>
