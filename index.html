@@ -30,6 +30,7 @@
             display: flex;
             align-items: center;
             margin-bottom: 15px;
+            position: relative;
         }
 
         .field-group label {
@@ -54,6 +55,7 @@
             width: 24px;
             height: 24px;
             vertical-align: middle;
+            margin-left: 4px;
         }
 
         button {
@@ -95,8 +97,7 @@
         }
 
         .flatpickr-calendar {
-            left: auto !important;
-            right: 0 !important;
+            z-index: 9999 !important;
         }
     </style>
     <script>
@@ -118,7 +119,7 @@
             <select id="dobDay"></select>
             <input type="text" id="dobYear" placeholder="Year">
             <input type="text" id="dobPicker" class="hidden-picker">
-            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" onclick="calendarRefs.dob.open()">
+            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" onclick="openCalendar('dob')">
         </div>
 
         <div class="field-group">
@@ -127,7 +128,7 @@
             <select id="ageDay"></select>
             <input type="text" id="ageYear" placeholder="Year">
             <input type="text" id="agePicker" class="hidden-picker">
-            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" onclick="calendarRefs.age.open()">
+            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" onclick="openCalendar('age')">
         </div>
 
         <button onclick="calculateAge()">Calculate Age</button>
@@ -170,10 +171,11 @@
         }
 
         function setupFlatpickr(prefix) {
-            calendarRefs[prefix] = flatpickr(`#${prefix}Picker`, {
+            const pickerElement = document.getElementById(`${prefix}Picker`);
+            calendarRefs[prefix] = flatpickr(pickerElement, {
                 defaultDate: new Date(),
                 disableMobile: true,
-                position: "auto right",
+                position: "below right",
                 onChange: function (selectedDates) {
                     const date = selectedDates[0];
                     document.getElementById(`${prefix}Year`).value = date.getFullYear();
@@ -181,6 +183,11 @@
                     document.getElementById(`${prefix}Day`).value = date.getDate();
                 }
             });
+        }
+
+        function openCalendar(prefix) {
+            const input = document.getElementById(`${prefix}Picker`);
+            calendarRefs[prefix].open();
         }
 
         populateDaysAndMonths('dobDay', 'dobMonth');
