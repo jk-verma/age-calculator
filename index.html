@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
+            margin-bottom: 20px;
+        }
+
+        input[type="date"] {
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 1.1em;
+            color: #333;
+        }
+    </style>
+
+    <!-- Google Adsense -->
+    <script data-ad-client="ca-pub-XXXXXXXXXXXXXXX" async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <!-- Replace "ca-pub-XXXXXXXXXXXXXXX" with your own Adsense client ID -->
+
+</head>
+<body>
+    <div class="container">
+        <h2>Age Calculator</h2>
+        <label for="dob">Date of Birth:</label>
+        <input type="date" id="dob">
+        <label for="ageAt">Age at the Date of:</label>
+        <input type="date" id="ageAt">
+        <button onclick="calculateAge()">Calculate Age</button>
+        <div id="result"></div>
+    </div>
+
+    <!-- Adsense Ad Slot -->
+    <ins class="adsbygoogle"
+         style="display:block; width: 350px; height: 100px;"
+         data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
+         data-ad-slot="XXXXXXXXXX"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>
+         (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+
+    <script>
+        function calculateAge() {
+            let dob = document.getElementById('dob').value;
+            let ageAtDate = document.getElementById('ageAt').value;
+
+            if (dob === '' || ageAtDate === '') {
+                document.getElementById('result').innerText = 'Please enter both dates!';
+                return;
+            }
+
+            let birthDate = new Date(dob);
+            let ageAt = new Date(ageAtDate);
+
+            if (ageAt < birthDate) {
+                document.getElementById('result').innerText = 'Age at date must be after birth date!';
+                return;
+            }
+
+            let ageYears = ageAt.getFullYear() - birthDate.getFullYear();
+            let ageMonths = ageAt.getMonth() - birthDate.getMonth();
+            let ageDays = ageAt.getDate() - birthDate.getDate();
+
+            if (ageDays < 0) {
+                ageMonths--;
+                ageDays += new Date(ageAt.getFullYear(), ageAt.getMonth(), 0).getDate();
+            }
+
+            if (ageMonths < 0) {
+                ageYears--;
+                ageMonths += 12;
+            }
+
+            document.getElementById('result').innerText = 
+                `You were ${ageYears} years, ${ageMonths} months, and ${ageDays} days old.`;
+        }
+    </script>
+</body>
+</html>
