@@ -88,7 +88,10 @@
 
         .hidden-picker {
             position: absolute;
-            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+            width: 1px;
+            height: 1px;
         }
     </style>
 </head>
@@ -102,7 +105,7 @@
             <select id="dobDay"></select>
             <input type="text" id="dobYear" placeholder="Year">
             <input type="text" id="dobPicker" class="hidden-picker">
-            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" id="dobIcon">
+            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" onclick="calendarRefs.dob.open()">
         </div>
 
         <div class="field-group">
@@ -111,7 +114,7 @@
             <select id="ageDay"></select>
             <input type="text" id="ageYear" placeholder="Year">
             <input type="text" id="agePicker" class="hidden-picker">
-            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" id="ageIcon">
+            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" onclick="calendarRefs.age.open()">
         </div>
 
         <button onclick="calculateAge()">Calculate Age</button>
@@ -124,12 +127,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
+        const calendarRefs = {};
+
         function populateDaysAndMonths(dayId, monthId) {
             const daySelect = document.getElementById(dayId);
             const monthSelect = document.getElementById(monthId);
 
             for (let i = 1; i <= 31; i++) {
-                let option = document.createElement('option');
+                const option = document.createElement('option');
                 option.value = i;
                 option.text = i;
                 daySelect.appendChild(option);
@@ -137,7 +142,7 @@
 
             const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
             months.forEach((month, index) => {
-                let option = document.createElement('option');
+                const option = document.createElement('option');
                 option.value = index;
                 option.text = month;
                 monthSelect.appendChild(option);
@@ -151,23 +156,16 @@
             document.getElementById(`${prefix}Day`).value = today.getDate();
         }
 
-        function attachCalendar(pickerId, yearId, monthId, dayId, iconId) {
-            const picker = document.getElementById(pickerId);
-            const icon = document.getElementById(iconId);
-
-            const fp = flatpickr(picker, {
+        function setupFlatpickr(prefix) {
+            calendarRefs[prefix] = flatpickr(`#${prefix}Picker`, {
                 defaultDate: new Date(),
-                onChange: function(selectedDates) {
+                disableMobile: true,
+                onChange: function (selectedDates) {
                     const date = selectedDates[0];
-                    document.getElementById(yearId).value = date.getFullYear();
-                    document.getElementById(monthId).value = date.getMonth();
-                    document.getElementById(dayId).value = date.getDate();
-                },
-                disableMobile: true
-            });
-
-            icon.addEventListener('click', () => {
-                fp.open();
+                    document.getElementById(`${prefix}Year`).value = date.getFullYear();
+                    document.getElementById(`${prefix}Month`).value = date.getMonth();
+                    document.getElementById(`${prefix}Day`).value = date.getDate();
+                }
             });
         }
 
@@ -177,8 +175,8 @@
         setDefaultDate('dob');
         setDefaultDate('age');
 
-        attachCalendar('dobPicker', 'dobYear', 'dobMonth', 'dobDay', 'dobIcon');
-        attachCalendar('agePicker', 'ageYear', 'ageMonth', 'ageDay', 'ageIcon');
+        setupFlatpickr('dob');
+        setupFlatpickr('age');
 
         function calculateAge() {
             const dob = new Date(document.getElementById('dobYear').value, document.getElementById('dobMonth').value, document.getElementById('dobDay').value);
