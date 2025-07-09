@@ -93,6 +93,11 @@
             width: 1px;
             height: 1px;
         }
+
+        .flatpickr-calendar {
+            left: auto !important;
+            right: 0 !important;
+        }
     </style>
 </head>
 <body>
@@ -160,6 +165,7 @@
             calendarRefs[prefix] = flatpickr(`#${prefix}Picker`, {
                 defaultDate: new Date(),
                 disableMobile: true,
+                position: "auto right",
                 onChange: function (selectedDates) {
                     const date = selectedDates[0];
                     document.getElementById(`${prefix}Year`).value = date.getFullYear();
