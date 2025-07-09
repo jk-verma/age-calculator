@@ -102,7 +102,7 @@
             <select id="dobDay"></select>
             <input type="text" id="dobYear" placeholder="Year">
             <input type="text" id="dobPicker" class="hidden-picker">
-            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" onclick="showCalendar('dob')">
+            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" id="dobIcon">
         </div>
 
         <div class="field-group">
@@ -111,7 +111,7 @@
             <select id="ageDay"></select>
             <input type="text" id="ageYear" placeholder="Year">
             <input type="text" id="agePicker" class="hidden-picker">
-            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" onclick="showCalendar('age')">
+            <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" id="ageIcon">
         </div>
 
         <button onclick="calculateAge()">Calculate Age</button>
@@ -124,8 +124,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        const calendarInstances = {};
-
         function populateDaysAndMonths(dayId, monthId) {
             const daySelect = document.getElementById(dayId);
             const monthSelect = document.getElementById(monthId);
@@ -153,23 +151,24 @@
             document.getElementById(`${prefix}Day`).value = today.getDate();
         }
 
-        function showCalendar(prefix) {
-            const picker = document.getElementById(`${prefix}Picker`);
+        function attachCalendar(pickerId, yearId, monthId, dayId, iconId) {
+            const picker = document.getElementById(pickerId);
+            const icon = document.getElementById(iconId);
 
-            if (!calendarInstances[prefix]) {
-                calendarInstances[prefix] = flatpickr(picker, {
-                    defaultDate: new Date(),
-                    onChange: function(selectedDates) {
-                        const date = selectedDates[0];
-                        document.getElementById(`${prefix}Year`).value = date.getFullYear();
-                        document.getElementById(`${prefix}Month`).value = date.getMonth();
-                        document.getElementById(`${prefix}Day`).value = date.getDate();
-                    },
-                    disableMobile: true
-                });
-            }
+            const fp = flatpickr(picker, {
+                defaultDate: new Date(),
+                onChange: function(selectedDates) {
+                    const date = selectedDates[0];
+                    document.getElementById(yearId).value = date.getFullYear();
+                    document.getElementById(monthId).value = date.getMonth();
+                    document.getElementById(dayId).value = date.getDate();
+                },
+                disableMobile: true
+            });
 
-            calendarInstances[prefix].open();
+            icon.addEventListener('click', () => {
+                fp.open();
+            });
         }
 
         populateDaysAndMonths('dobDay', 'dobMonth');
@@ -177,6 +176,9 @@
 
         setDefaultDate('dob');
         setDefaultDate('age');
+
+        attachCalendar('dobPicker', 'dobYear', 'dobMonth', 'dobDay', 'dobIcon');
+        attachCalendar('agePicker', 'ageYear', 'ageMonth', 'ageDay', 'ageIcon');
 
         function calculateAge() {
             const dob = new Date(document.getElementById('dobYear').value, document.getElementById('dobMonth').value, document.getElementById('dobDay').value);
