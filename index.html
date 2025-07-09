@@ -5,15 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Age Calculator</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- Google AdSense (replace ca-pub-xxxxxxxxxxxxxxxx with your AdSense publisher ID) -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-xxxxxxxxxxxxxxxx"
+            crossorigin="anonymous"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+            margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            align-items: flex-start;
+            min-height: 100vh;
             flex-direction: column;
         }
 
@@ -22,30 +26,34 @@
             padding: 25px;
             border-radius: 12px;
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-            width: 450px;
-            margin-bottom: 20px;
+            width: 100%;
+            max-width: 480px;
+            margin: auto;
         }
 
         .field-group {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             margin-bottom: 15px;
             position: relative;
         }
 
         .field-group label {
-            flex: 0 0 140px;
-            text-align: left;
-            margin-right: 10px;
+            flex: 1 1 100%;
+            margin-bottom: 6px;
             white-space: nowrap;
+        }
+
+        .field-group select,
+        .field-group input[type="text"] {
+            margin-right: 5px;
         }
 
         #dobMonth, #dobDay, #dobYear,
         #ageMonth, #ageDay, #ageYear {
-            width: 60px !important;
-            min-width: 60px;
+            width: 60px;
             padding: 6px;
-            margin-right: 5px;
             border: 1px solid #b0bec5;
             border-radius: 4px;
         }
@@ -56,6 +64,15 @@
             height: 24px;
             vertical-align: middle;
             margin-left: 4px;
+        }
+
+        .calendar-trigger {
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            border: none;
+            margin-left: -4px;
+            pointer-events: none;
         }
 
         button {
@@ -82,22 +99,29 @@
         }
 
         footer {
-            position: absolute;
-            bottom: 10px;
+            width: 100%;
+            text-align: center;
             font-size: 0.9em;
             color: #607d8b;
-        }
-
-        .hidden-picker {
-            position: absolute;
-            opacity: 0;
-            pointer-events: none;
-            width: 1px;
-            height: 1px;
+            margin-top: auto;
+            margin-bottom: 10px;
         }
 
         .flatpickr-calendar {
             z-index: 9999 !important;
+        }
+
+        @media (min-width: 600px) {
+            .field-group label {
+                flex: 0 0 140px;
+                text-align: left;
+                margin-right: 10px;
+                margin-bottom: 0;
+            }
+
+            .field-group {
+                flex-wrap: nowrap;
+            }
         }
     </style>
     <script>
@@ -114,20 +138,20 @@
         <h2 style="text-align: center;">Age Calculator</h2>
 
         <div class="field-group">
-            <label>Date of Birth:</label>
+            <label for="dobMonth">Date of Birth:</label>
             <select id="dobMonth"></select>
             <select id="dobDay"></select>
             <input type="text" id="dobYear" placeholder="Year">
-            <input type="text" id="dobPicker" class="hidden-picker">
+            <input type="text" id="dobPicker" class="calendar-trigger" readonly>
             <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" onclick="openCalendar('dob')">
         </div>
 
         <div class="field-group">
-            <label>Age at the Date of:</label>
+            <label for="ageMonth">Age at the Date of:</label>
             <select id="ageMonth"></select>
             <select id="ageDay"></select>
             <input type="text" id="ageYear" placeholder="Year">
-            <input type="text" id="agePicker" class="hidden-picker">
+            <input type="text" id="agePicker" class="calendar-trigger" readonly>
             <img src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/1024/calendar-icon.png" class="calendar-icon" onclick="openCalendar('age')">
         </div>
 
@@ -172,10 +196,12 @@
 
         function setupFlatpickr(prefix) {
             const pickerElement = document.getElementById(`${prefix}Picker`);
+            const triggerElement = pickerElement.nextElementSibling;
             calendarRefs[prefix] = flatpickr(pickerElement, {
                 defaultDate: new Date(),
                 disableMobile: true,
-                position: "below right",
+                position: "auto right",
+                positionElement: triggerElement,
                 onChange: function (selectedDates) {
                     const date = selectedDates[0];
                     document.getElementById(`${prefix}Year`).value = date.getFullYear();
@@ -186,7 +212,6 @@
         }
 
         function openCalendar(prefix) {
-            const input = document.getElementById(`${prefix}Picker`);
             calendarRefs[prefix].open();
         }
 
